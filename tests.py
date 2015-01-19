@@ -13,7 +13,12 @@ logger = logging.getLogger(__name__)
 
 class ModelTests(unittest.TestCase):
 
+    def setUp(self):
+        logger.info("----------------")
+
     def test_simple_get_set(self):
+        logger.info("test_simple_get_set")
+
         class TestModel1(jsonmodels.JsonModel):
             Field1 = jsonmodels.JsonProperty('Field1')
 
@@ -23,6 +28,8 @@ class ModelTests(unittest.TestCase):
         self.assertEquals(2, model.Field1)
 
     def test_simple_toentity(self):
+        logger.info("test_simple_toentity")
+
         class TestModel1(jsonmodels.JsonModel):
             Field1 = jsonmodels.JsonProperty('Field1')
             Field2 = jsonmodels.JsonProperty('Field2')
@@ -41,6 +48,8 @@ class ModelTests(unittest.TestCase):
         self.assertTrue(obj.has_key('Field2'), "Now the string should be present")
 
     def test_simple_fromentity(self):
+        logger.info("test_simple_fromentity")
+
         class TestModel1(jsonmodels.JsonModel):
             Field1 = jsonmodels.JsonProperty('Field1')
             Field2 = jsonmodels.JsonProperty('Field2')
@@ -55,6 +64,8 @@ class ModelTests(unittest.TestCase):
         self.assertEquals("is set", model.Field2)
 
     def test_nested(self):
+        logger.info("test_nested")
+
         class TestModel1(jsonmodels.JsonModel):
             Field1 = jsonmodels.JsonProperty('Field1')
             Field2 = jsonmodels.JsonProperty('Field2')
@@ -83,6 +94,8 @@ class ModelTests(unittest.TestCase):
         logger.info(json.dumps(model.to_json_entity()))
 
     def test_list_models(self):
+        logger.info("test_list_models")
+
         class TestModel1(jsonmodels.JsonModel):
             Field1 = jsonmodels.JsonProperty('Field1')
             Field2 = jsonmodels.JsonProperty('Field2')
@@ -108,6 +121,8 @@ class ModelTests(unittest.TestCase):
         '''
         Are values we don't know ignored on from_json_entity ?
         '''
+        logger.info("test_ignore_unknowns")
+
         class TestModel1(jsonmodels.JsonModel):
             Field1 = jsonmodels.JsonProperty('Field1')
             Field2 = jsonmodels.JsonProperty('Field2')
@@ -115,6 +130,26 @@ class ModelTests(unittest.TestCase):
         model = TestModel1.from_json_entity({'Field3': 'unknown'})
         self.assertIsNone(model.Field1)
         self.assertIsNone(model.Field2)
+
+    def test_null_nested(self):
+        '''
+        If a value of None is given in a nested element, we should maintain that in the nested list
+        '''
+        logger.info("test_null_nested")
+
+        class TestModel1(jsonmodels.JsonModel):
+            Field1 = jsonmodels.JsonProperty('Field1')
+
+        class TestModel2(jsonmodels.JsonModel):
+            Nested = jsonmodels.JsonModelListProperty('Nested', TestModel1)
+
+        model = TestModel2.from_json_entity({'Nested': None})
+
+        logger.info(pprint.pformat(model.to_json_entity()))
+        self.assertIsNone(model.Nested)
+
+        obj = model.to_json_entity()
+        self.assertIsNone(obj['Nested'])
 
 
 if __name__ == "__main__":

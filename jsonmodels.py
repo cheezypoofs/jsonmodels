@@ -139,12 +139,16 @@ class JsonModelListProperty(JsonProperty):
         '''
         Convert to a list of json objects
         '''
+        if value is None:
+            return None
         return [v.to_json_entity() for v in value]
 
     def from_json_entity(self, value):
         '''
         Convert from a list of json objects into model instances
         '''
+        if value is None:
+            return None
         return [self.__model_class.from_json_entity(v) for v in value]
 
 class JsonModel(object):
