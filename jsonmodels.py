@@ -198,6 +198,9 @@ class JsonModel(object):
         '''
         Create a new instance of this class (or subclass) based on the json object 'obj'.
         '''
+        if obj is None:
+            return None
+
         assert isinstance(obj, dict)
 
         instance = cls()
