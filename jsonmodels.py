@@ -151,6 +151,45 @@ class JsonModelListProperty(JsonProperty):
             return None
         return [self.__model_class.from_json_entity(v) for v in value]
 
+class JsonModelDictProperty(JsonProperty):
+    '''
+    A more complex version of JsonProperty that handles a dictionary.
+
+    The assumption is that only simple types are used as keys since the hashing of objects is not
+    trivial to define over an API. So, only the 'type' of the value need be specified.
+
+    The assumption is also that the key values can be used as-is
+    '''
+    def __init__(self, name, model_class):
+        super(JsonModelDictProperty, self).__init__(name)
+        self.__model_class = model_class
+
+    def to_json_entity(self, value):
+        '''
+        Convert from a dict of key -> models, to dict -> json entities
+        '''
+        if value is None:
+            return None
+
+        result = {}
+        for k, v in value.iteritems():
+            # v is of type self.__model_class
+            assert isinstance(v, self.__model_class)
+            obj = v.to_json_entity()
+            result[k] = obj
+        return result
+
+    def from_json_entity(self, value):
+        '''
+        Convert from a dict of json objects into key -> model instances
+        '''
+        if value is None:
+            return None
+        result = {}
+        for k, v in value.iteritems():
+            result[k] = self.__model_class.from_json_entity(v)
+        return result
+
 class JsonModel(object):
     '''
     Base class for any model definition that will need to be (de)serialized via JSON.
