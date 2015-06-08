@@ -229,7 +229,7 @@ class JsonModel(object):
         for name, prop in inspect.getmembers(self.__class__, lambda x: isinstance(x, JsonProperty)):
             if not self.__props.has_key(name):
                 continue
-            result[name] = prop.to_json_entity(self.__props[name])
+            result[prop.name] = prop.to_json_entity(self.__props[name])
         return result
 
     @classmethod
@@ -240,14 +240,12 @@ class JsonModel(object):
         if obj is None:
             return None
 
-        assert isinstance(obj, dict)
-
         instance = cls()
         # For each property defined, see if there is a value in obj
         for name, prop in inspect.getmembers(cls, lambda x: isinstance(x, JsonProperty)):
-            if not obj.has_key(name):
+            if not obj.has_key(prop.name):
                 continue
-            instance.json_properties[prop.name] = prop.from_json_entity(obj[name])
+            instance.json_properties[name] = prop.from_json_entity(obj[prop.name])
         return instance
 
 
