@@ -119,12 +119,16 @@ class JsonModelProperty(JsonProperty):
         '''
         Tell the model to turn itself to a json object
         '''
+        if value is None:
+            return None
         return value.to_json_entity()
 
     def from_json_entity(self, value):
         '''
         Use the class' method to convert the json object into an instance of itself
         '''
+        if value is None:
+            return None
         return self.__model_class.from_json_entity(value)
 
 class JsonModelListProperty(JsonProperty):
